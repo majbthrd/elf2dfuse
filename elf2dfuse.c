@@ -354,6 +354,7 @@ int main(int argc, char *argv[])
 	dfufp = fopen(argv[2], "wb");
 	if (!dfufp)
 	{
+		fclose(elffp);
 		printf("ERROR: unable to open file <%s> for writing\n", argv[2]);
 		return -1;
 	}
@@ -365,6 +366,8 @@ int main(int argc, char *argv[])
 	readEh(elffp); 
 	if (checkEh()) 
 	{
+		fclose(elffp);
+		fclose(dfufp);
 		printEh();
 		return -1;
 	}
@@ -407,6 +410,7 @@ int main(int argc, char *argv[])
 			}
 		} 
 	}
+	free(ph);
 
 	/* we've read everything we need from the ELF file, so we can close the file */
 	fclose(elffp);
