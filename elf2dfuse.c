@@ -26,7 +26,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define USB_VENDOR_ID  0x0483
+#define USB_VENDOR_ID	 0x0483
 #define USB_PRODUCT_ID 0xdf11
 
 typedef struct Elf32_Ehdr
@@ -447,11 +447,11 @@ int main(int argc, char *argv[])
 	*/
 
 	i = 0;
-	scratchpad[i++] = 'D';
-	scratchpad[i++] = 'f';
-	scratchpad[i++] = 'u';
-	scratchpad[i++] = 'S';
-	scratchpad[i++] = 'e';
+	scratchpad[i++] = (uint8_t)'D';
+	scratchpad[i++] = (uint8_t)'f';
+	scratchpad[i++] = (uint8_t)'u';
+	scratchpad[i++] = (uint8_t)'S';
+	scratchpad[i++] = (uint8_t)'e';
 	scratchpad[i++] = 0x01 /* bVersion */;
 	scratchpad[i++] = (uint8_t)(file_size >> 0);
 	scratchpad[i++] = (uint8_t)(file_size >> 8);
@@ -467,12 +467,12 @@ int main(int argc, char *argv[])
 	*/
 
 	memset(scratchpad, 0, sizeof(scratchpad));
-	scratchpad[0] = 'T';
-	scratchpad[1] = 'a';
-	scratchpad[2] = 'r';
-	scratchpad[3] = 'g';
-	scratchpad[4] = 'e';
-	scratchpad[5] = 't';
+	scratchpad[0] = (uint8_t)'T';
+	scratchpad[1] = (uint8_t)'a';
+	scratchpad[2] = (uint8_t)'r';
+	scratchpad[3] = (uint8_t)'g';
+	scratchpad[4] = (uint8_t)'e';
+	scratchpad[5] = (uint8_t)'t';
 	scratchpad[266] = (uint8_t)(target_size >> 0);
 	scratchpad[267] = (uint8_t)(target_size >> 8);
 	scratchpad[268] = (uint8_t)(target_size >> 16);
@@ -550,9 +550,9 @@ int main(int argc, char *argv[])
 	scratchpad[i++] = (uint8_t)(USB_VENDOR_ID >> 8);
 	scratchpad[i++] = 0x1A; // bcdDFU
 	scratchpad[i++] = 0x01;
-	scratchpad[i++] = 'U'; // ucDfuSignature
-	scratchpad[i++] = 'F';
-	scratchpad[i++] = 'D';
+	scratchpad[i++] = (uint8_t)'U'; // ucDfuSignature
+	scratchpad[i++] = (uint8_t)'F';
+	scratchpad[i++] = (uint8_t)'D';
 	scratchpad[i++] = 16; // bLength
 
 	/* the CRC-32 has now been calculated over the entire file, save for the CRC field itself */
