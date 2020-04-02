@@ -28,6 +28,7 @@
 
 #define USB_VENDOR_ID	 0x0483
 #define USB_PRODUCT_ID 0xdf11
+#define DFU_SUFFIX_SIZE 16
 
 typedef struct Elf32_Ehdr
 {
@@ -420,8 +421,15 @@ int main(int argc, char *argv[])
 	*/
 
 	blob = pm_list; image_elements = 1; i = 0;
-	
-	file_size = 11 /* DfuSe prefix */ + sizeof(scratchpad) /* Target Prefix */ + 16 /* DFU Suffix */; target_size = 0;
+	/*
+	although the RFC "ST's UM0391 Rev 1" states the "The DFUImageSize field, four-byte coded, presents the total DFU file length in bytes",
+	suffix was intended to be used by the host software only, as it stated later in RFC "ST's UM0391 Rev 1 section 2.2",
+	and it must be stripped from the file before being sent to the device therefore it is not considered part of the DFU file.
+
+	This implementation is aligned with other packing utilities like defuse-pack.py and flashing utilities like
+	dfu-util, dfu-tool
+	*/
+	file_size = 11 /* DfuSe prefix */ + sizeof(scratchpad) /* Target Prefix */ /* + DFU_SUFFIX_SIZE */ /* DFU Suffix */; target_size = 0;
 
 	while (blob)
 	{
@@ -453,10 +461,10 @@ int main(int argc, char *argv[])
 	scratchpad[i++] = (uint8_t)'S';
 	scratchpad[i++] = (uint8_t)'e';
 	scratchpad[i++] = 0x01 /* bVersion */;
-	scratchpad[i++] = (uint8_t)(file_size >> 0);
-	scratchpad[i++] = (uint8_t)(file_size >> 8);
-	scratchpad[i++] = (uint8_t)(file_size >> 16);
-	scratchpad[i++] = (uint8_t)(file_size >> 24);
+	scratchpad[i++] = (uint8_t)(file_size >> 0);   /* DFUImageSize */
+	scratchpad[i++] = (uint8_t)(file_size >> 8);   /* DFUImageSize */
+	scratchpad[i++] = (uint8_t)(file_size >> 16);  /* DFUImageSize */
+	scratchpad[i++] = (uint8_t)(file_size >> 24);  /* DFUImageSize */
 	scratchpad[i++] = 1 /* bTargets */;
 
 	crc32 = crc32_calc(0xFFFFFFFF, scratchpad, i);
@@ -553,7 +561,7 @@ int main(int argc, char *argv[])
 	scratchpad[i++] = (uint8_t)'U'; // ucDfuSignature
 	scratchpad[i++] = (uint8_t)'F';
 	scratchpad[i++] = (uint8_t)'D';
-	scratchpad[i++] = 16; // bLength
+	scratchpad[i++] = DFU_SUFFIX_SIZE; // bLength
 
 	/* the CRC-32 has now been calculated over the entire file, save for the CRC field itself */
 	crc32 = crc32_calc(crc32, scratchpad, i);
