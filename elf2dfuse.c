@@ -422,12 +422,9 @@ int main(int argc, char *argv[])
 
 	blob = pm_list; image_elements = 1; i = 0;
 	/*
-	although the RFC "ST's UM0391 Rev 1" states the "The DFUImageSize field, four-byte coded, presents the total DFU file length in bytes",
-	suffix was intended to be used by the host software only, as it stated later in RFC "ST's UM0391 Rev 1 section 2.2",
-	and it must be stripped from the file before being sent to the device therefore it is not considered part of the DFU file.
-
-	This implementation is aligned with other packing utilities like defuse-pack.py and flashing utilities like
-	dfu-util, dfu-tool
+	ST's UM0391 Rev 1 states the "The DFUImageSize field, four-byte coded, presents the total DFU file length in bytes".
+	This seems to include it should the DFU suffix length.  However, adopting the behavior of excluding the DFU suffix length
+    from DFUImageSize makes this utility's output compatible with other utilities like defuse-pack.py, dfu-util, and dfu-tool
 	*/
 	file_size = 11 /* DfuSe prefix */ + sizeof(scratchpad) /* Target Prefix */ /* + DFU_SUFFIX_SIZE */ /* DFU Suffix */; target_size = 0;
 
